@@ -6,6 +6,8 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.csz.core.util.Util;
+
 /**
  * @author caishuzhan
  */
@@ -19,6 +21,7 @@ public class ChildPanelImpl implements PanelGroup {
     public void adjustPanelHeight(int heightMeasureSpec) {
         if (heightMeasureSpec > 0 && heightMeasureSpec < displayHeight && heightMeasureSpec != panelHeight) {
             panelHeight = heightMeasureSpec;
+            Util.saveKeyboardHeight(target.getContext(), panelHeight);
         }
     }
 
@@ -34,6 +37,7 @@ public class ChildPanelImpl implements PanelGroup {
 
     @Override
     public void setup(View hostView) {
+        panelHeight = Util.getKeyboardHeight(hostView.getContext());
         this.target = hostView;
         final WindowManager windowManager = (WindowManager) hostView.getContext().getSystemService(Context.WINDOW_SERVICE);
         final Display display = windowManager.getDefaultDisplay();

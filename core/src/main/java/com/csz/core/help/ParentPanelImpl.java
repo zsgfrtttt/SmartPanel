@@ -5,7 +5,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -41,7 +40,7 @@ public class ParentPanelImpl implements PanelGroup {
     public void setup(View hostView) {
         rootView = hostView.getRootView();
         if (rootView == null) {
-            Log.e("csz", "setup error with root null!"); //todo
+            Log.e("csz", "setup error with root null!");
             return;
         }
         final WindowManager windowManager = (WindowManager) hostView.getContext().getSystemService(Context.WINDOW_SERVICE);

@@ -60,5 +60,5 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 # 联系方式 
-如果你在使用AndPermission过程中发现任何问题，你可以通过如下方式联系我：
+如果你在使用SmartPanel过程中发现任何问题，你可以通过如下方式联系我：
 * 邮箱: 1058079995@qq.com

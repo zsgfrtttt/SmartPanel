@@ -5,6 +5,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -77,7 +78,6 @@ public class ParentPanelImpl implements PanelGroup {
 
             final Rect frame = new Rect();
             rootView.getWindowVisibleDisplayFrame(frame);
-
             int bottomChangeSize = 0;
             if (lastFrame.bottom > 0) {
                 bottomChangeSize = frame.bottom - lastFrame.bottom;
@@ -104,12 +104,14 @@ public class ParentPanelImpl implements PanelGroup {
     }
 
     /**
-     * @param bottomChangeSize >0:证明软键盘收起   <0:软键盘弹出
+     * 启动Activity的时候可能会measure多次，所以bottomChangeSize可能键盘不弹出但是 > 0
+     * @param bottomChangeSize >0:证明软键盘收起 (初始启动也是>0)  <0:软键盘弹出
      */
     private void checkSoftKeyboardAction(int bottomChangeSize) {
         if (bottomChangeSize > 0 && !isOpenSoftKeyboard()) {
             childPanel.adjustPanelHeight(bottomChangeSize);
             if (isShowPanel) {
+                isShowPanel = false;
                 openPanel();
             } else {
                 notifyStateChanged();

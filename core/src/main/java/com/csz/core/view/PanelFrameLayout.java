@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
  * @author caishuzhan
  */
 public class PanelFrameLayout extends FrameLayout implements PanelGroup {
+
     private PanelGroup panelGroup;
 
     public PanelFrameLayout(Context context) {

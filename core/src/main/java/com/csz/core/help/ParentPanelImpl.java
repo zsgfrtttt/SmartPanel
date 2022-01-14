@@ -1,5 +1,6 @@
 package com.csz.core.help;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -9,18 +10,20 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 
+import com.csz.core.util.Util;
+
 /**
  * @author caishuzhan
  */
 public class ParentPanelImpl implements PanelGroup {
+    private static float KEYBOARD_MIN_HEIGHT_RATIO = 0.15f;
 
+    private View originView;
     private View rootView;
     private final ChildPanel childPanel;
     private KeyboardOpListener keyboardOpListener;
 
     private final Rect lastFrame = new Rect();
-    private int lastWindowInsetBottom;
-    private int displayHeightWithInsetBottom;
     private boolean isShowPanel;
 
     private boolean isRealOpenPanel;
@@ -38,16 +41,12 @@ public class ParentPanelImpl implements PanelGroup {
 
     @Override
     public void setup(View hostView) {
+        originView = hostView;
         rootView = hostView.getRootView();
         if (rootView == null) {
             Log.e("csz", "setup error with root null!");
             return;
         }
-        final WindowManager windowManager = (WindowManager) hostView.getContext().getSystemService(Context.WINDOW_SERVICE);
-        final Display display = windowManager.getDefaultDisplay();
-        final Point size = new Point();
-        display.getSize(size);
-        displayHeightWithInsetBottom = size.y + getWindowStableInsetBottom();
     }
 
     @Override
@@ -61,6 +60,7 @@ public class ParentPanelImpl implements PanelGroup {
         }
     }
 
+
     @Override
     public void closePanel() {
         childPanel.closePanel();
@@ -73,8 +73,6 @@ public class ParentPanelImpl implements PanelGroup {
 
     private void updateFrameSize() {
         if (rootView != null) {
-            lastWindowInsetBottom = getWindowStableInsetBottom();
-
             final Rect frame = new Rect();
             rootView.getWindowVisibleDisplayFrame(frame);
             int bottomChangeSize = 0;
@@ -87,23 +85,8 @@ public class ParentPanelImpl implements PanelGroup {
     }
 
     /**
-     * 获取底部装饰的高度
-     *
-     * @return
-     */
-    private int getWindowStableInsetBottom() {
-        if (rootView == null) {
-            return 0;
-        }
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            final WindowInsets rootWindowInsets = rootView.getRootWindowInsets();
-            return rootWindowInsets.getStableInsetBottom();
-        }
-        return 0;
-    }
-
-    /**
      * 启动Activity的时候可能会measure多次，所以bottomChangeSize可能键盘不弹出但是 > 0
+     *
      * @param bottomChangeSize >0:证明软键盘收起 (初始启动也是>0)  <0:软键盘弹出
      */
     private void checkSoftKeyboardAction(int bottomChangeSize) {
@@ -133,7 +116,19 @@ public class ParentPanelImpl implements PanelGroup {
     }
 
     private boolean isOpenSoftKeyboard() {
-        return lastFrame.bottom != 0 && lastFrame.bottom + lastWindowInsetBottom != displayHeightWithInsetBottom && lastFrame.height() + lastWindowInsetBottom != displayHeightWithInsetBottom;
+        Activity activity = Util.findActivity(originView.getContext());
+        if (activity != null) {
+            View activityRoot = Util.getContentRoot(activity);
+            Rect r = new Rect();
+            activityRoot.getWindowVisibleDisplayFrame(r);
+
+            int[] location = new int[2];
+            Util.getContentRoot(activity).getLocationOnScreen(location);
+            int screenHeight = activityRoot.getRootView().getHeight();
+            int heightDiff = screenHeight - lastFrame.height() - location[1];
+            return heightDiff > screenHeight * KEYBOARD_MIN_HEIGHT_RATIO;
+        }
+        return false;
     }
 
     @Override

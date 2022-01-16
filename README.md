@@ -13,7 +13,7 @@ allprojects {
 ```
 添加依赖
 dependencies {
-	       implementation 'com.github.zsgfrtttt:SmartPanel:1.0.0'
+	       implementation 'com.github.zsgfrtttt:SmartPanel:1.1.2'
 	}
 ```
 # 基本使用
